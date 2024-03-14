@@ -41,4 +41,22 @@ public class HelloTargetProxyTest {
             softly.assertThat(proxy.sayThankYou("yonghu")).isEqualTo("THANK YOU YONGHU");
         });
     }
+
+    @Test
+    void testLazyLoadingProxy(){
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(Person.class);
+        enhancer.setCallback(new LazyLoader() {
+            @Override
+            public Object loadObject() throws Exception {
+                return new Person(1L, "lazy", 10, "lazymail", null);
+            }
+        });
+        Person proxy = (Person) enhancer.create();
+        System.out.println(proxy.getClass());
+        assertSoftly(softly -> {
+            softly.assertThat(proxy.getId()).isEqualTo(1L);
+            softly.assertThat(proxy.getName()).isEqualTo("lazy");
+        });
+    }
 }
